@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import * as dat from 'dat.gui';
 import akwanza from '../img/akwanza.jpg';
 import stars from '../img/stars.jpg';
@@ -32,7 +33,7 @@ const orbit = new OrbitControls(camera, renderer.domElement)
 const axesHelper = new THREE.AxesHelper(5);
 scene.add(axesHelper);
 
-camera.position.set(30, 30, 30);
+camera.position.set(0, 1, 6);
 orbit.update();
 
 const boxGeometry = new THREE.BoxGeometry();
@@ -51,7 +52,7 @@ scene.add(plane);
 plane.rotation.x = -0.5 * Math.PI;
 plane.receiveShadow = true;
 
-const gridHelper = new THREE.GridHelper(30);
+const gridHelper = new THREE.GridHelper(10, 30);
 scene.add(gridHelper)
 
 const sphereGeometry = new THREE.SphereGeometry(4, 10, 10);
@@ -168,9 +169,21 @@ assetLoader.load(humanoidUrl.href, function(gltf) {
     // console.log(model.children[1].material.opacity)
     scene.add(model);
     model.position.set(0, 0, 0);
-    }, undefined, function(error){
-        console.error(error)
+    tControl.attach(model)
+}, undefined, function(error){
+    console.error(error)
 });
+
+tControl = new TransformControls(camera, renderer.domElement)
+
+tControl.addEventListener('dragging-changed', (e)=>{
+    orbit.enabled = !e.value
+})
+
+tControl.setMode('scale')
+scene.add(tControl);
+
+
 
 const gui = new dat.GUI();
 
