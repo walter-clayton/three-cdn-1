@@ -1,12 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import * as dat from 'dat.gui';
-import akwanza from '../img/akwanza.jpg';
-import stars from '../img/stars.jpg';
-import nebula from '../img/nebula.jpg';
-import { ceilPowerOfTwo } from 'three/src/math/MathUtils';
-import { DirectionalLightHelper, Texture } from 'three';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 const humanoidUrl = new URL('../assets/humanoid.glb', import.meta.url);
@@ -22,194 +16,115 @@ document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(
-    45, 
+    65, 
     window.innerWidth / window.innerHeight, 
-    0.1, 
+    0.1,
     1000
 );
 
 const orbit = new OrbitControls(camera, renderer.domElement)
 
-const axesHelper = new THREE.AxesHelper(5);
+const axesHelper = new THREE.AxesHelper(1);
 scene.add(axesHelper);
 
-camera.position.set(0, 1, 6);
+camera.position.set(0, 3, 6);
 orbit.update();
 
-const boxGeometry = new THREE.BoxGeometry();
-const boxMaterial = new THREE.MeshBasicMaterial({color: 0x00FF00})
-const box = new THREE.Mesh(boxGeometry, boxMaterial);
-scene.add(box);
-box.position.set(5, 10, 0);
-
-const planeGeometry = new THREE.PlaneGeometry(30, 30);
+const planeGeometry = new THREE.PlaneGeometry(5, 5);
 const planeMaterial = new THREE.MeshStandardMaterial({
-    color: 0xFFFFFF,
+    color: 0xF,
     side: THREE.DoubleSide
 })
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 scene.add(plane);
 plane.rotation.x = -0.5 * Math.PI;
-plane.receiveShadow = true;
-
-const gridHelper = new THREE.GridHelper(10, 30);
-scene.add(gridHelper)
-
-const sphereGeometry = new THREE.SphereGeometry(4, 10, 10);
-const sphereMaterial = new THREE.MeshStandardMaterial({
-    color: 0x0000FF,
-    wireframe: false,
-});
-const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-scene.add(sphere);
-sphere.position.set(-10, 10, 0);
-sphere.castShadow = true; 
 
 const ambientLight = new THREE.AmbientLight(0x333333);
 scene.add(ambientLight);
 
-// const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 0.8);
-// scene.add(directionalLight);
-// directionalLight.position.set(-30, 50, 0);
-// directionalLight.castShadow = true;
-// directionalLight.shadow.camera.bottom = -20; 
-
-// const dlightHelper = new THREE.DirectionalLightHelper(directionalLight,  5);
-// scene.add(dlightHelper);
-
-// const dlightShadowHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
-// scene.add(dlightShadowHelper);
+const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 0.8);
+scene.add(directionalLight);
+directionalLight.position.set(-30, 50, 0);
+directionalLight.castShadow = true;
+directionalLight.shadow.camera.bottom = -20; 
 
 const spotLight = new THREE.SpotLight(0xFFFFFF);
 scene.add(spotLight);
-spotLight.position.set(-100, 100, 0);
+spotLight.position.set(40, 80, 20);
 spotLight.castShadow = true;
 spotLight.angle = 0.05;
 
-const sLightHelper = new THREE.SpotLightHelper(spotLight);
-scene.add(sLightHelper);
-
-// scene.fog = new THREE.Fog(0xFFFFFF, 10, 100);
-scene.fog = new THREE.FogExp2(0xFFFFFF, 0.01);
-
-// renderer.setClearColor(0xFFEA00);
-
-const textureLoader = new THREE.TextureLoader();
-scene.background = textureLoader.load(nebula);
-// const cubeTextureLoader = new THREE.CubeTextureLoader();
-// scene.background = cubeTextureLoader.load([
-//     stars,
-//     akwanza,
-//     stars,
-//     stars,
-//     stars,
-//     stars
-// ]);
-
-const box2Geometry = new THREE.BoxGeometry(4,4,4);
-const box2Material = new THREE.MeshBasicMaterial({
-//    color: 0x00FF00,
-//     map: textureLoader.load(akwanza)
-});
-const box2MultiMaterial = [
-    new THREE.MeshBasicMaterial({map: textureLoader.load(stars)}),
-    new THREE.MeshBasicMaterial({map: textureLoader.load(stars)}),
-    new THREE.MeshBasicMaterial({map: textureLoader.load(nebula)}),
-    new THREE.MeshBasicMaterial({map: textureLoader.load(akwanza)}),
-    new THREE.MeshBasicMaterial({map: textureLoader.load(nebula)}),
-    new THREE.MeshBasicMaterial({map: textureLoader.load(stars)}),
-]
-const box2 = new THREE.Mesh(box2Geometry, box2MultiMaterial);
-scene.add(box2);
-box2.position.set(0, 15, 10);
-// box2.material.map = textureLoader.load(nebula)
-
-const plane2Geometry = new THREE.PlaneGeometry(10, 10, 10, 10);
-const plane2Material = new THREE.MeshBasicMaterial({
-    color: 0xFFFFFF,
-    wireframe: true
-});
-const plane2 = new THREE.Mesh(plane2Geometry, plane2Material);
-scene.add(plane2);
-plane2.position.set(10, 10, 15);
-
-plane2.geometry.attributes.position.array[0] -= 10 * Math.random();
-plane2.geometry.attributes.position.array[1] -= 10 * Math.random();
-plane2.geometry.attributes.position.array[2] -= 10 * Math.random();
-const lastPointZ = plane2.geometry.attributes.position.array.length - 1;
-plane2.geometry.attributes.position.array[lastPointZ] -= 10 * Math.random();
-
-const sphere2Geometry = new THREE.SphereGeometry(4);
-
-// const vShader = `
-//     void main() {
-//         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-//     }
-// `;
-
-// const fShader = `
-//     void main() {
-//         gl_FragColor = vec4(0.5, 0.5, 1.0, 1.0);
-//     }
-// `;
-
-const sphere2Material = new THREE.ShaderMaterial({
-    vertexShader: document.getElementById('vertexShader').textContent,
-    fragmentShader: document.getElementById('fragmentShader').textContent
-});
-
-const sphere2 = new THREE.Mesh(sphere2Geometry, sphere2Material);
-scene.add(sphere2);
-sphere2.position.set(-5, 10, 10);
+renderer.setClearColor(0x00000);
 
 const assetLoader = new GLTFLoader();
 
-assetLoader.load(humanoidUrl.href, function(gltf) {
-    const model = gltf.scene;
-    // console.log(model.children[1].material.opacity)
+const gui = new dat.GUI();
+
+const humanFolder = gui.addFolder( 'Human Size' );
+humanFolder.open();
+
+assetLoader.load(humanoidUrl.href, function(glb) {
+
+    const model = glb.scene;
     scene.add(model);
+    console.log(model)
     model.position.set(0, 0, 0);
-    tControl.attach(model)
+    
+    const options = {
+        'Scale Model Proportionately': 1,
+        'Height': 1,
+        'Weight': 1,
+        'Neck girth': 0.05,
+        'Biceps girth': 0.05,
+        'Calf girth': 0.05   
+    }
+    const scaleProportionately = humanFolder.addFolder('Scale Proportionately');
+    scaleProportionately.add(options, 'Scale Model Proportionately', 0.7, 1.3).onChange(function(e){
+        model.scale.set(e,e,e);
+    });
+
+    const anthropometrics = humanFolder.addFolder('Anthropometrics');
+    anthropometrics.open();
+    anthropometrics.add(options, 'Height', 0.7, 1.3).onChange(function(e){
+        model.scale.y = e;
+    });
+    anthropometrics.add(options, 'Weight', 0.7, 1.3).onChange(function(e){
+        model.scale.z = e;
+        model.scale.x = e;
+        
+        if(bodyParts = e/7){
+            model.getObjectByName('torso').scale.y = bodyParts;
+            model.getObjectByName('torso').scale.x = bodyParts;
+            model.getObjectByName('abdominal').scale.y = bodyParts;
+            model.getObjectByName('abdominal').scale.x = bodyParts;
+            model.getObjectByName('right_thigh').scale.y = bodyParts;
+            model.getObjectByName('right_thigh').scale.x = bodyParts;
+            model.getObjectByName('left_thigh').scale.y = bodyParts;
+            model.getObjectByName('left_thigh').scale.x = bodyParts;
+            model.getObjectByName('right_calf').scale.y = bodyParts;
+            model.getObjectByName('abdominal').scale.x = bodyParts;
+        }
+    });
+    anthropometrics.add(options, 'Neck girth', 0, 0.2).onChange(function(e){
+        model.getObjectByName('neck').scale.y = e;
+        model.getObjectByName('neck').scale.x = e;
+    });
+    anthropometrics.add(options, 'Biceps girth', 0, 0.2).onChange(function(e){
+        model.getObjectByName('right_arm').scale.y = e;
+        model.getObjectByName('left_arm').scale.y = e;
+        model.getObjectByName('right_arm').scale.x = e;
+        model.getObjectByName('left_arm').scale.x = e;
+    });
+    anthropometrics.add(options, 'Calf girth', 0, 0.2).onChange(function(e){
+        model.getObjectByName('right_calf').scale.y = e;
+        model.getObjectByName('left_calf').scale.y = e;
+        model.getObjectByName('right_calf').scale.x = e;
+        model.getObjectByName('left_calf').scale.x = e;
+    });
+    
 }, undefined, function(error){
     console.error(error)
 });
-
-tControl = new TransformControls(camera, renderer.domElement)
-
-tControl.addEventListener('dragging-changed', (e)=>{
-    orbit.enabled = !e.value
-})
-
-tControl.setMode('scale')
-scene.add(tControl);
-
-
-
-const gui = new dat.GUI();
-
-const options = {
-    sphereColor: '#ffea00',
-    wireframe: false, 
-    speed: 0.01, 
-    angle: 0.02,
-    penumbra: 0,
-    intensity: 1,
-};
-
-gui.addColor(options, 'sphereColor').onChange(function(e){
-    sphere.material.color.set(e);
-})
-
-gui.add(options, 'wireframe').onChange(function(e){
-    sphere.material.wireframe = e; 
-})
-
-gui.add(options, 'speed', 0, 0.1);
-gui.add(options, 'angle', 0, 0.1);
-gui.add(options, 'penumbra', 0, 1);
-gui.add(options, 'intensity', 0, 1);
-
-let step = 0; 
 
 const mousePosition = new THREE.Vector2();
 
@@ -220,36 +135,11 @@ window.addEventListener('mousemove', function(e){
 
 const rayCaster = new THREE.Raycaster();
 
-const sphereId = sphere.id;
-box2.name = 'theBox';
+function animate(){
 
-function animate(time){
-    box.rotation.x = time / 1000;
-    box.rotation.y = time / 1000;
-    box.rotation.z = time / 1000;
-
-    step += options.speed; 
-    sphere.position.y = 10 * Math.abs(Math.sin(step));
-
-    spotLight.angle = options.angle;
-    spotLight.penumbra = options.penumbra;
-    spotLight.intensity = options.intensity;
-    sLightHelper.update();
 
     rayCaster.setFromCamera(mousePosition, camera);
     const intersects = rayCaster.intersectObjects(scene.children);
-    // console.log(intersects);
-
-    for(let i = 0; i < intersects.length; i++){
-        if(intersects[i].object.id === sphereId)
-            intersects[i].object.material.color.set(0xFF0000);
-        
-        if(intersects[i].object.name === 'theBox') {
-            intersects[i].object.rotation.x = time / 1000;
-            intersects[i].object.rotation.y = time / 1000;
-        }
-    }
-
     renderer.render(scene, camera);
 }
 
