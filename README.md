@@ -12,7 +12,7 @@ Install Parcel by Parcel by typing the following command:
 ******
 
 Run Parcel by typing this command: 
-> npm parcel ./src/index.html
+> npx parcel ./src/index.html
 ******
 
 Ctrl + left click on the address generated in the command line. Or open your browser and copy paste this address http://localhost:1234
